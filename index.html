@@ -16,6 +16,7 @@
         <p>Here is static content in the web page. You'll notice that it gets replaced by our app as soon as we start it.</p>
       </div>
       <div id="dialog-region"></div>
+
     </div>
 
 
@@ -26,18 +27,19 @@
     </script>
 
     <script type="text/template" id="new-view">
+      <div class="page-header">
+        <h1>Todo list</h1>
+      </div>
       <div class="form-group">
           <input type="text" id="todo-input" class="form-control" placeholder="Add an Item to your list">
       </div>
         <button type="submit" class="btn btn-primary submit">Submit</button>
+      <hr>
+      <div>
+        <ul>
+        </ul>
+      </div>
     </script>
-
-    <script type="text/template" id="todos-template">
-      <ul>
-        <li></li>
-      </ul>
-    </script>
-
 
 
     <script src="./assets/js/vendor/jquery.js"></script>
@@ -53,8 +55,5 @@
     <script src="./assets/js/vendor/spin.jquery.js"></script>
 
     <script src="./assets/js/app.js"></script>
-    <script type="text/javascript">
-      Geneva.start();
-    </script>
   </body>
 </html>

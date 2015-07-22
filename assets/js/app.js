@@ -6,54 +6,75 @@ Geneva.addRegions({
 
 Geneva.on("start", function() {
   Backbone.history.start();
-
   Geneva.mainRegion.show(new Geneva.TestView())
 });
 
 var Todo = Backbone.Model.extend({
   defaults: {
-    content: ''
-    completed: false;
+    title: '',
+    completed: false,
   },
-  toggle: {
+  toggle: function () {
     this.save({
-      completed: !this.get('completed');
+      completed: !this.get('completed')
     });
+  }
+});
+
+var Item = Backbone.View.extend({
+  tagName: 'li',
+  className: 'item todo',
+  template: _.template('<div class="col-md-3"><%- title %> <input type="checkbox" <%- completed ? "checked=checked" : "" %></p>'),
+  events: {
+    'change input': 'save'
+  },
+  initialize: function(options) {},
+  save: function() {
+    this.model.toggle();
+  },
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
   }
 });
 
 var Todos = Backbone.Collection.extend({
   model: Todo,
-  localStorage: new Backbone.LocalStorage('todos-backbone'),
 });
-
-var todos = new Todos();
 
 Geneva.TestView = Marionette.LayoutView.extend({
   template: "#new-view",
   initialize: function(options) {
-    console.log(todos);
-  },
-  events: {
-    'click' : 'clicked'
+    this.collection = new Todos();
   },
 
-  clicked: function(){
-    $('.submit').on('click', function(){
-      var todo = new Todo();
-      todo.set('content', $('#todo-input').val());
-      todos.add(todo);
-      todos.each(function(element){
-        console.log(element.get('content'));
-      })
-    })
+  events: {
+    'click .submit' : 'clicked',
+    'mouseover li': 'addDelete'
   },
-  onRender: function(){
-    console.log("Hi there! I'm the render. All the html has been rendered")
+  addDelete : function(){
+    this.$('li').find('input').append('hi');
   },
+
+  clicked: function() {
+    this.collection.add({title: $('#todo-input').val()});
+    this.onRender();
+  },
+
+  onRender: function() {
+    this.$('ul').empty();
+    this.collection.each(function(model) {
+      this.$('ul').append((new Item({model: model})).render().el);
+    }, this);
+  },
+
   templateHelpers: function() {
     return {
       tempVariable: "This is how you pass variables to the template"
     };
   }
+});
+
+$(function() {
+  Geneva.start();
 });
