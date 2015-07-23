@@ -16,7 +16,6 @@
         <p>Here is static content in the web page. You'll notice that it gets replaced by our app as soon as we start it.</p>
       </div>
       <div id="dialog-region"></div>
-
     </div>
 
 
@@ -31,16 +30,21 @@
         <h1>Todo list</h1>
       </div>
       <div class="form-group">
-          <input type="text" id="todo-input" class="form-control" placeholder="Add an Item to your list">
-          <input type="text" id="datepicker" placeholder="Select a due date...">
+        <input type="text" id="todo-input" class="form-control" placeholder="Add an Item to your list">
+        <input type="text" id="datepicker" placeholder="Select a due date...">
       </div>
         <button type="submit" class="btn btn-primary submit">Submit</button>
       <hr>
-      <div>
-        <ul>
-        </ul>
-      </div>
-    </script>
+      <table class="table">
+        <thead>
+          <th>Title</th>
+          <th>Due</th>
+          <th>Completed</th>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </script> 
 
 
     <script src="./assets/js/vendor/jquery.js"></script>

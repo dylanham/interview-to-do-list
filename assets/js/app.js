@@ -22,9 +22,9 @@ var Todo = Backbone.Model.extend({
 });
 
 var Item = Backbone.View.extend({
-  tagName: 'li',
+  tagName: 'tr',
   className: 'item todo',
-  template: _.template('<p><%- title %> <%- due %><input type="checkbox" <%- completed ? "checked=checked" : "" %>><button class="delete btn btn-danger">Delete</button></p>'),
+  template: _.template('<td> <%- completed ? "<s>" + title + "</s>" : title %></td><td><%- due %></td><td><input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
   events: {
     'change input': 'save',
     'click .delete': 'delete',
@@ -32,6 +32,7 @@ var Item = Backbone.View.extend({
   initialize: function(options) {},
   save: function() {
     this.model.toggle();
+    this.remove();
   },
   delete: function(){
     this.model.destroy();
@@ -46,6 +47,9 @@ var Item = Backbone.View.extend({
 var Todos = Backbone.Collection.extend({
   model: Todo,
   localStorage: new Backbone.LocalStorage('todos'),
+  comparator: function(model) {
+    return model.get('due')
+  }
 });
 
 Geneva.TestView = Marionette.LayoutView.extend({
@@ -55,11 +59,11 @@ Geneva.TestView = Marionette.LayoutView.extend({
   },
 
   events: {
-    'click .submit' : 'clicked',
+    'click .submit' : 'submited',
     'click .delete' : 'deleteClicked',
   },
 
-  clicked: function() {
+  submited: function() {
     this.collection.add({title: $('#todo-input').val(), due: $('#datepicker').val()});
     this.onRender();
   },
@@ -68,10 +72,10 @@ Geneva.TestView = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    this.$('ul').empty();
+    this.$('tr').empty();
     this.collection.each(function(model) {
       model.save();
-      this.$('ul').append((new Item({model: model})).render().el);
+      this.$('tbody').append((new Item({model: model})).render().el);
     }, this);
   },
 
