@@ -24,7 +24,7 @@ var Todo = Backbone.Model.extend({
 var Item = Backbone.View.extend({
   tagName: 'tr',
   className: 'item todo',
-  template: _.template('<td> <%- completed ? "<s>" + title + "</s>" : title %></td><td><%- due %></td><td><input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
+  template: _.template('<td> <%= completed ? "<s>" + title + "</s>" : title %></td><td><%- due %></td><td>Complete <input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
   events: {
     'change input': 'save',
     'click .delete': 'delete',
@@ -32,7 +32,7 @@ var Item = Backbone.View.extend({
   initialize: function(options) {},
   save: function() {
     this.model.toggle();
-    this.remove();
+    this.render();
   },
   delete: function(){
     this.model.destroy();
@@ -66,9 +66,6 @@ Geneva.TestView = Marionette.LayoutView.extend({
   submited: function() {
     this.collection.add({title: $('#todo-input').val(), due: $('#datepicker').val()});
     this.onRender();
-  },
-
-  deleteClicked: function(){
   },
 
   onRender: function() {
