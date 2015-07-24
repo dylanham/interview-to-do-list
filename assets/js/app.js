@@ -1,12 +1,12 @@
 var Geneva = new Marionette.Application();
-
+var todoValue = $('#todo-input').val();
 Geneva.addRegions({
-  mainRegion: "#main-region"
+  mainRegion: "#main-region",
 });
 
 Geneva.on("start", function() {
   Backbone.history.start();
-  Geneva.mainRegion.show(new Geneva.TestView())
+  Geneva.mainRegion.show(new Geneva.ListView());
 });
 
 var Todo = Backbone.Model.extend({
@@ -24,7 +24,30 @@ var Todo = Backbone.Model.extend({
 var Item = Backbone.View.extend({
   tagName: 'tr',
   className: 'item todo',
-  template: _.template('<td> <%= completed ? "<s>" + title + "</s>" : title %></td><td><%- due %></td><td>Complete <input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
+  template: _.template('<td> <%- title %> </td><td><%- due %></td><td>Complete <input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
+  events: {
+    'change input': 'save',
+    'click .delete': 'delete',
+  },
+  initialize: function(options) {},
+  save: function() {
+    this.model.toggle();
+    this.remove();
+  },
+  delete: function(){
+    this.model.destroy();
+    this.remove();
+  },
+  render: function() {
+    this.$el.html(this.template(this.model.toJSON()));
+    return this;
+  }
+});
+
+var CompletedItem = Backbone.View.extend({
+  tagName: 'li',
+  className: 'complted-todo',
+  template: _.template('<p> <s><%- title %> </s>'),
   events: {
     'change input': 'save',
     'click .delete': 'delete',
@@ -52,15 +75,15 @@ var Todos = Backbone.Collection.extend({
   }
 });
 
-Geneva.TestView = Marionette.LayoutView.extend({
+Geneva.ListView = Marionette.LayoutView.extend({
   template: "#new-view",
   initialize: function(options) {
     this.collection = new Todos();
+    this.listenTo(this.collection, 'change', this.renderCompleted);
   },
 
   events: {
     'click .submit' : 'submited',
-    'click .delete' : 'deleteClicked',
   },
 
   submited: function() {
@@ -72,13 +95,32 @@ Geneva.TestView = Marionette.LayoutView.extend({
     this.$('tr').empty();
     this.collection.each(function(model) {
       model.save();
-      this.$('tbody').append((new Item({model: model})).render().el);
+      if (!model.get('completed')){
+        this.$('tbody').append((new Item({model: model})).render().el);
+      }
+    }, this);
+  },
+
+  renderCompleted: function() {
+    this.$('.count').empty();
+    this.$('.count').hide();
+    var collectionCount = this.collection.where({completed: true}).length
+    if (collectionCount > 0){
+      var countStringExtension = collectionCount > 1 ? ' items completed' : ' item completed';
+      this.$('.count').show();
+      this.$('.count').append(collectionCount + countStringExtension);
+    }
+    this.$('ul').empty();
+    this.collection.each(function(model) {
+      if (model.get('completed')) {
+        this.$('ul').append((new CompletedItem({model: model})).render().el);
+      }
     }, this);
   },
 
   templateHelpers: function() {
     return {
-      tempVariable: "This is how you pass variables to the template"
+      tempVariable: function(){ return this.collection.where({completed: true}).length }.bind(this)()
     };
   }
 });

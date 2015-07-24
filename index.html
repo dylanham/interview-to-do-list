@@ -15,7 +15,7 @@
       <div id="main-region" class="container">
         <p>Here is static content in the web page. You'll notice that it gets replaced by our app as soon as we start it.</p>
       </div>
-      <div id="dialog-region"></div>
+      <div id="completed-region" class="container"></div>
     </div>
 
 
@@ -30,14 +30,19 @@
         <h1>Todo list</h1>
       </div>
       <div class="form-group">
-        <input type="text" id="todo-input" class="form-control" placeholder="Add an Item to your list">
-        <input type="text" id="datepicker" placeholder="Select a due date...">
+        <div class="col-md-12">
+          <input type="text" id="todo-input" class="form-control" placeholder="Add an Item to your list">
+          <input type="text" id="datepicker" placeholder="Select a due date...">
+          <button type="submit" class="btn btn-primary submit">Add Task</button>
+        </div>
       </div>
-        <button type="submit" class="btn btn-primary submit">Submit</button>
       <table class="table table-striped">
         <tbody>
         </tbody>
       </table>
+      <h3 class="count"> </h3>
+      <ul>
+      </ul>
     </script>
 
 
