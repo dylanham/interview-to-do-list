@@ -22,12 +22,13 @@ var Todo = Backbone.Model.extend({
 });
 
 var Item = Backbone.View.extend({
-  tagName: 'tr',
-  className: 'item todo',
-  template: _.template('<td> <%- title %> </td><td><%- due %></td><td>Complete <input type="checkbox" <%- completed ? "checked=checked" : "" %>></td><td><button class="delete btn btn-danger">Delete</button></td>'),
+  className: 'well well-sm',
+  template: _.template(' <input type="checkbox" <%- completed ? "checked=checked" : "" %>>  <%- title %> - <em class="text-center"><%- due %></em> <a class="pull-right delete">Remove</a>'),
   events: {
-    'change input': 'save',
+    'change input:checkbox': 'save',
     'click .delete': 'delete',
+    'dblclick' : 'edit',
+    'click .update': 'update',
   },
   initialize: function(options) {},
   save: function() {
@@ -38,6 +39,15 @@ var Item = Backbone.View.extend({
     this.model.destroy();
     this.remove();
   },
+  edit: function(){
+    this.$el.html('<input type="text" class="edit-task form-control" value= ' + this.model.get('title') + '> <input type="text" id="dateupdater" class="edit-task form-control" value= ' + this.model.get('due') + '> <button class="update btn btn-primary">Update</button>');
+    $( "#dateupdater").datepicker();
+  },
+  update: function(){
+    this.model.set('title', $('.edit-task').val());
+    this.model.set('due', $('#dateupdater').val());
+    this.render();
+  },
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     return this;
@@ -45,9 +55,8 @@ var Item = Backbone.View.extend({
 });
 
 var CompletedItem = Backbone.View.extend({
-  tagName: 'li',
-  className: 'complted-todo',
-  template: _.template('<p> <s><%- title %> </s>'),
+  className: 'well well-sm',
+  template: _.template('<input type="checkbox" <%- completed ? "checked=checked" : "" %>> <s><%- title %> </s> '),
   events: {
     'change input': 'save',
     'click .delete': 'delete',
@@ -79,6 +88,7 @@ Geneva.ListView = Marionette.LayoutView.extend({
   template: "#new-view",
   initialize: function(options) {
     this.collection = new Todos();
+    this.listenTo(this.collection, 'change:completed', this.onRender);
     this.listenTo(this.collection, 'change', this.renderCompleted);
   },
 
@@ -92,11 +102,11 @@ Geneva.ListView = Marionette.LayoutView.extend({
   },
 
   onRender: function() {
-    this.$('tr').empty();
+    this.$('.tasks').empty();
     this.collection.each(function(model) {
       model.save();
       if (!model.get('completed')){
-        this.$('tbody').append((new Item({model: model})).render().el);
+        this.$('.tasks').append((new Item({model: model})).render().el);
       }
     }, this);
   },
@@ -110,17 +120,17 @@ Geneva.ListView = Marionette.LayoutView.extend({
       this.$('.count').show();
       this.$('.count').append(collectionCount + countStringExtension);
     }
-    this.$('ul').empty();
+    this.$('.completed-tasks').empty();
     this.collection.each(function(model) {
       if (model.get('completed')) {
-        this.$('ul').append((new CompletedItem({model: model})).render().el);
+        this.$('.completed-tasks').append((new CompletedItem({model: model})).render().el);
       }
     }, this);
   },
 
   templateHelpers: function() {
     return {
-      tempVariable: function(){ return this.collection.where({completed: true}).length }.bind(this)()
+      tempVariable: ''
     };
   }
 });

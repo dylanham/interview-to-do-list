@@ -10,6 +10,10 @@ table {
   margin-top: 10px;
 }
 
-.submit {
+.update, .delete, .submit {
   margin-bottom: 11px;
+}
+
+.delete:hover {
+  cursor: pointer;
 }
