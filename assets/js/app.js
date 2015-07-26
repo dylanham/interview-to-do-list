@@ -23,7 +23,8 @@ var Todo = Backbone.Model.extend({
 
 var Item = Backbone.View.extend({
   className: 'well well-sm',
-  template: _.template(' <input type="checkbox" <%- completed ? "checked=checked" : "" %>>  <%- title %> - <em class="text-center"><%- due %></em> <a class="pull-right delete">Remove</a>'),
+  template: _.template('<input type="checkbox" <%- completed ? "checked=checked" : "" %>>  <%- title %> <%- due ? "-" : "" %> <em><%- due %></em> <a class="pull-right delete">Remove</a>'),
+  editTemplate: _.template('<input type="text" class="edit-task form-control" value="<%- title%>" <input type="text" id="dateupdater" class="edit-task form-control" value="<%- due %>"><button class="update btn btn-primary">Update</button>'),
   events: {
     'change input:checkbox': 'save',
     'click .delete': 'delete',
@@ -40,12 +41,13 @@ var Item = Backbone.View.extend({
     this.remove();
   },
   edit: function(){
-    this.$el.html('<input type="text" class="edit-task form-control" value= ' + this.model.get('title') + '> <input type="text" id="dateupdater" class="edit-task form-control" value= ' + this.model.get('due') + '> <button class="update btn btn-primary">Update</button>');
+    this.$el.html(this.editTemplate(this.model.toJSON()));
     $( "#dateupdater").datepicker();
   },
   update: function(){
     this.model.set('title', $('.edit-task').val());
     this.model.set('due', $('#dateupdater').val());
+    this.model.save();
     this.render();
   },
   render: function() {
@@ -112,27 +114,21 @@ Geneva.ListView = Marionette.LayoutView.extend({
   },
 
   renderCompleted: function() {
-    this.$('.count').empty();
-    this.$('.count').hide();
+    var $count = this.$('.count');
+    var $completed = this.$('.completed-tasks');
+    $count.empty().hide();
     var collectionCount = this.collection.where({completed: true}).length
     if (collectionCount > 0){
       var countStringExtension = collectionCount > 1 ? ' items completed' : ' item completed';
-      this.$('.count').show();
-      this.$('.count').append(collectionCount + countStringExtension);
+      $count.show().append('<div class="wrapper">' + collectionCount + countStringExtension + '<div>');
     }
-    this.$('.completed-tasks').empty();
+    $completed.empty();
     this.collection.each(function(model) {
       if (model.get('completed')) {
-        this.$('.completed-tasks').append((new CompletedItem({model: model})).render().el);
+        $completed.append((new CompletedItem({model: model})).render().el);
       }
     }, this);
   },
-
-  templateHelpers: function() {
-    return {
-      tempVariable: ''
-    };
-  }
 });
 
 $(function() {
