@@ -14,6 +14,11 @@ var Todo = Backbone.Model.extend({
     title: '',
     completed: false,
   },
+  validate: function(attrs){
+    if (!attrs.title){
+      return 'Please add a title';
+    }
+  },
   toggle: function () {
     this.save({
       completed: !this.get('completed')
@@ -99,8 +104,15 @@ Geneva.ListView = Marionette.LayoutView.extend({
   },
 
   submited: function() {
-    this.collection.add({title: $('#todo-input').val(), due: $('#datepicker').val()});
-    this.onRender();
+    var title = $('#todo-input').val();
+    var error = this.$('.error');
+    if (!title.trim()) {
+      error.html('<div class="alert alert-danger">Please add a tittle for this task.</div>')
+    } else {
+      error.empty();
+      this.collection.add({title: title, due: $('#datepicker').val()});
+      this.onRender();
+    }
   },
 
   onRender: function() {
