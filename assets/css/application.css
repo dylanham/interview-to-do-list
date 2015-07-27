@@ -13,6 +13,9 @@ table {
 .update, .delete, .submit {
   margin-bottom: 11px;
 }
+.update {
+  margin-left: 3px;
+}
 
 .delete:hover {
   cursor: pointer;
