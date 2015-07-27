@@ -107,7 +107,7 @@ Geneva.ListView = Marionette.LayoutView.extend({
     var title = $('#todo-input').val();
     var error = this.$('.error');
     if (!title.trim()) {
-      error.html('<div class="alert alert-danger">Please add a tittle for this task.</div>')
+      error.html('<div class="alert alert-danger">Please add a title for this task.</div>')
     } else {
       error.empty();
       this.collection.add({title: title, due: $('#datepicker').val()});
