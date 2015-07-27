@@ -104,23 +104,24 @@ Geneva.ListView = Marionette.LayoutView.extend({
   },
 
   submited: function() {
-    var title = $('#todo-input').val();
-    var error = this.$('.error');
+    var $title = $('#todo-input').val();
+    var $error = this.$('.error');
     if (!title.trim()) {
-      error.html('<div class="alert alert-danger">Please add a title for this task.</div>')
+      $error.html('<div class="alert alert-danger">Please add a title for this task.</div>')
     } else {
-      error.empty();
-      this.collection.add({title: title, due: $('#datepicker').val()});
+      $error.empty();
+      this.collection.add({title: $title, due: $('#datepicker').val()});
       this.onRender();
     }
   },
 
   onRender: function() {
-    this.$('.tasks').empty();
+    var $tasks = this.$('.tasks');
+    $tasks.empty();
     this.collection.each(function(model) {
       model.save();
       if (!model.get('completed')){
-        this.$('.tasks').append((new Item({model: model})).render().el);
+        this.$tasks.append((new Item({model: model})).render().el);
       }
     }, this);
   },
